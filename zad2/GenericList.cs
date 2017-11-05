@@ -4,94 +4,86 @@ using System.Collections.Generic;
 
 namespace zad2
 {
-    public class GenericList<TX> : IGenericList<TX>
+    public class GenericList<X> : IGenericList<X>
     {
-        private TX[] _internalStorage;
+        private X[] _internalStorage;
         private int _size;
         private int _lastIndex;
 
         public GenericList()
         {
             _size = 4;
-            _internalStorage = new TX[_size];
+            _internalStorage = new X[_size];
             _lastIndex = -1;
         }
 
-        public GenericList(int initialSize)
+        public GenericList(int InitialSize)
         {
-            _size = initialSize;
-            _internalStorage = new TX[_size];
+            _size = InitialSize;
+            _internalStorage = new X[_size];
             _lastIndex = -1;
         }
 
-        public void Add(TX item)
+        public void Add(X item)
         {
             if (_lastIndex + 1 == _size)
             {
-                TX[] hepler = _internalStorage;
-                _internalStorage = new TX[_size * 2];
+                X[] hepler = _internalStorage;
+                _internalStorage = new X[_size * 2];
+                _size *= 2;
                 _lastIndex = -1;
-
-                foreach (TX element in hepler)
+                foreach (X element in hepler)
                 {
-                    if (element == null) break;
+                    if (element.Equals(null)) break;
                     _lastIndex++;
                     _internalStorage[_lastIndex] = element;
                 }
             }
-
             _lastIndex++;
             _internalStorage[_lastIndex] = item;
         }
 
-        public bool Remove(TX item)
+        public bool Remove(X item)
         {
-            int i = -1;
-            foreach (TX element in _internalStorage)
+            try
             {
-                if (element == null) break;
-                i++;
-                if (element.Equals(item))
-                {
-                    return RemoveAt(i);
-                }
+                return RemoveAt(IndexOf(item));
             }
-
-            return false;
+            catch (IndexOutOfRangeException ex)
+            {
+                return false;
+            }
         }
 
         public bool RemoveAt(int index)
         {
-            if (index + 1 >= _size)
+            if (index > _lastIndex || index < 0)
             {
                 throw new IndexOutOfRangeException();
             }
-            TX[] helper = _internalStorage;
-            for (int i = index + 1; i < _size; i++)
+            for (int i = index + 1; i <= _lastIndex; i++)
             {
-                _internalStorage[index] = helper[i];
-                index++;
+                _internalStorage[i - 1] = _internalStorage[i];
             }
+            _lastIndex--;
             return true;
         }
 
-        public TX GetElement(int index)
+        public X GetElement(int index)
         {
-            if (index < _size && index >= -1)
+            if (index <= _lastIndex && index > -1)
             {
                 return _internalStorage[index];
             }
             throw new IndexOutOfRangeException();
         }
 
-        public int IndexOf(TX item)
+        public int IndexOf(X item)
         {
-            int i = -1;
-            foreach (TX element in _internalStorage)
+            if (_lastIndex == -1) return -1;
+            for (int j = 0; j <= _lastIndex; j++)
             {
-                if(element == null) break;
-                i++;
-                if (element.Equals(item)) return i;
+                if (_internalStorage[j].Equals(item)) return j;
             }
             return -1;
         }
@@ -100,19 +92,19 @@ namespace zad2
 
         public void Clear()
         {
-            _internalStorage = new TX[_size];
+            _internalStorage = new X[_size];
             _lastIndex = -1;
         }
 
-        public bool Contains(TX item)
+        public bool Contains(X item)
         {
             if (IndexOf(item) != -1) return true;
             return false;
         }
 
-        public IEnumerator<TX> GetEnumerator()
+        public IEnumerator<X> GetEnumerator()
         {
-            return new GenericListEnumerator<TX>(this);
+            return new GenericListEnumerator<X>(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
